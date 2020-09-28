@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style type="text/css">
+    .btn-group .current {
+      background-color: yellow;
+      border-color: yellow;
+    }
+  </style>
+  <body>
+    <div class="J_calculator">
+      <p class="result">0</p>
+      <div class="input-group">
+        <input type="text" class="s-input" value="0" />
+        <input type="text" class="f-input" value="0" />
+      </div>
+      <div class="btn-group">
+        <button type="text" data-field="plus" class="current">+</button>
+        <button type="text" data-field="minus">-</button>
+        <button type="text" data-field="mul">*</button>
+        <button type="text" data-field="div">/</button>
+      </div>
+    </div>
+    <script>
+      class Compute {
+        plus(a, b) {
+          return a + b;
+        }
+        minus(a, b) {
+          return a - b;
+        }
+        mul(a, b) {
+          return a * b;
+        }
+        div(a, b) {
+          return a / b;
+        }
+      }
+      class Calculator extends Compute {
+        constructor(doc) {
+          super();
+          const oCal = doc.getElementsByClassName("J_calculator")[0];
+          this.fInput = oCal.getElementsByTagName("input")[0];
+          this.sInput = oCal.getElementsByTagName("input")[1];
+          this.oBtnGroup = oCal.getElementsByClassName("btn-group")[0];
+          this.oBtnItems = this.oBtnGroup.getElementsByTagName("button");
+          this.oResult = oCal.getElementsByClassName("result")[0];
+          this.data = this.defineData();
+          this.btnIdx = 0;
+        }
+        init() {
+          this.bindEvent();
+        }
+        bindEvent() {
+          this.oBtnGroup.addEventListener(
+            "click",
+            this.onFieldBtnClick.bind(this),
+            false
+          );
+          this.sInput.addEventListener(
+            "input",
+            this.onNumberInput.bind(this),
+            false
+          );
+          this.fInput.addEventListener(
+            "input",
+            this.onNumberInput.bind(this),
+            false
+          );
+        }
+        defineData() {
+          let _obj = {},
+            fNumber = 0,
+            sNumber = 0,
+            field = "plus";
+          const _self = this;
+          Object.defineProperties(_obj, {
+            fNumber: {
+              get() {
+                return fNumber;
+              },
+              set(newVal) {
+                fNumber = newVal;
+                _self.computeResult(fNumber, sNumber, field);
+              },
+            },
+            sNumber: {
+              get() {
+                return sNumber;
+              },
+              set(newVal) {
+                sNumber = newVal;
+                _self.computeResult(fNumber, sNumber, field);
+              },
+            },
+            field: {
+              get() {
+                return field;
+              },
+              set(newVal) {
+                field = newVal;
+                _self.computeResult(fNumber, sNumber, field);
+              },
+            },
+          });
+          return _obj;
+        }
+        onFieldBtnClick(ev) {
+          const e = ev || window.event,
+            tar = e.target || e.srcElement,
+            tagName = tar.tagName.toLowerCase();
+          tagName === "button" && this.fieldUpdate(tar);
+        }
+        fieldUpdate(target) {
+          this.oBtnItems[this.btnIdx].className = "";
+          this.btnIdx = [].indexOf.call(this.oBtnItems, target);
+          target.className += "current";
+          this.data.field = target.getAttribute("data-field");
+        }
+        onNumberInput(ev) {
+          const e = ev || window.event,
+            tar = e.target || e.srcElement,
+            className = tar.className,
+            val = Number(tar.value.replace(/\s+/g, "")) || 0;
+          switch (className) {
+            case "f-input":
+              this.data.fNumber = val;
+              break;
+            case "s-input":
+              this.data.sNumber = val;
+              break;
+            default:
+              break;
+          }
+        }
+        computeResult(sNumber, fNumber,field) {
+          this.oResult.innerText = this[field](fNumber, sNumber);
+
+        }
+      }
+
+      new Calculator(document).init();
+
+      function DataArr() {
+        var _val = null,
+          _arr = [];
+        Object.defineProperty(this, "val", {
+          get() {
+            return _val;
+          },
+          set(newVal) {
+            _val = newVal;
+            _arr.push({ val: _val });
+            // console.log('新添加了一个:'+_val);
+          },
+        });
+        this.getArr = function () {
+          return _arr;
+        };
+      }
+      var dataArr = new DataArr();
+      // console.log(dataArr);
+      dataArr.val = "123";
+      dataArr.val = "456";
+      // console.log(dataArr);
+      // console.log(dataArr.getArr());
+    </script>
+  </body>
+</html>
